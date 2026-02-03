@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Per Ems 💘</title>
+  <style>
+    :root{
+      --bg1:#ffdde1;
+      --bg2:#ee9ca7;
+      --card:#ffffffcc;
+      --text:#1f1f1f;
+      --yes:#22c55e;
+      --no:#ef4444;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, var(--bg1), transparent 60%),
+                  radial-gradient(1200px 800px at 80% 90%, var(--bg2), transparent 60%),
+                  linear-gradient(135deg, #fff1f2, #ffe4e6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      overflow:hidden;
+    }
+
+    .card{
+      width:min(560px, 100%);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid #ffffff99;
+      border-radius:24px;
+      padding:28px 22px;
+      box-shadow: 0 18px 60px #00000022;
+      text-align:center;
+      position:relative;
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing: .2px;
+    }
+
+    .dear{
+      margin:14px 0 0;
+      font-size: 18px;
+      opacity:.9;
+    }
+
+    #name{
+      margin:8px 0 16px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height:1.05;
+    }
+
+    .question{
+      margin:0 0 18px;
+      font-size: clamp(18px, 2.4vw, 22px);
+    }
+
+    .buttons{
+      position:relative;
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      padding:18px 8px 6px;
+      min-height:84px;
+    }
+
+    .btn{
+      border:0;
+      border-radius:999px;
+      padding:12px 18px;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active{ transform: translateY(1px) scale(0.99); }
+    .yes{ background: var(--yes); color:white; box-shadow: 0 10px 28px #22c55e55; }
+    .no { background: var(--no);  color:white; box-shadow: 0 10px 28px #ef444455; }
+
+    .hint{
+      margin:10px 0 0;
+      font-size: 13px;
+      opacity:.65;
+    }
+
+    .hidden{ display:none; }
+
+    /* cuoricini */
+    #hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+    }
+
+    .heart{
+      position:absolute;
+      left:0;
+      top:-40px;
+      width:14px;
+      height:14px;
+      transform: rotate(45deg);
+      background: #ff4d6d;
+      opacity:.9;
+      animation: fall linear forwards;
+      filter: drop-shadow(0 6px 10px #00000022);
+    }
+    .heart::before, .heart::after{
+      content:"";
+      position:absolute;
+      width:14px;
+      height:14px;
+      background:#ff4d6d;
+      border-radius:50%;
+    }
+    .heart::before{ left:-7px; top:0; }
+    .heart::after { left:0; top:-7px; }
+
+    @keyframes fall{
+      to{
+        transform: translateY(110vh) rotate(45deg);
+        opacity: 0.05;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .btn{ transition:none; }
+      .heart{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="hearts" aria-hidden="true"></div>
+
+  <main class="card" id="askCard">
+    <h1>Domanda importantissimissima!</h1>
+
+    <p class="dear">Per</p>
+    <div id="name">💖 Ems 💖</div>
+
+    <p class="question">vuoi essere il mio appuntamento di San Valentino? 💘</p>
+
+    <div class="buttons" id="buttons">
+      <button class="btn yes" id="yesBtn">Sì!</button>
+      <button class="btn no" id="noBtn">No</button>
+    </div>
+
+    <p class="hint">(Consiglio: scegli “Sì”)</p>
+  </main>
+
+  <main class="card hidden" id="yesCard">
+    <h1>SÌÌÌ! 💖</h1>
+    <p style="margin:10px 0 0; font-size:18px;">
+      <span id="yesName">Ems</span>, lo sapevo! Ti amo tantissimo.
+    </p>
+    <p style="margin:10px 0 0; font-size:16px; opacity:.9;">
+      Hai vinto tanti abbraccini, tanti bacini… e un appuntamento bellissimo. 🥰
+    </p>
+    <p style="margin:16px 0 0; font-size:14px; opacity:.7;">
+      (Screenshot obbligatorio come prova da esibire prima dell'appuntamento)
+    </p>
+  </main>
+
+  <script>
+    // --- Nome (di default "Ems", ma puoi passarlo come ?name=Qualcosa) ---
+    const DEFAULT_NAME = "Ems";
+    const params = new URLSearchParams(window.location.search);
+    const rawName = (params.get("name") || "").trim();
+    const displayName = rawName.length ? rawName : DEFAULT_NAME;
+
+    document.getElementById("name").textContent = displayName;
+    document.getElementById("yesName").textContent = displayName;
+    document.title = `Per ${displayName} 💘`;
+
+    // --- Bottoni ---
+    const buttonsWrap = document.getElementById("buttons");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+
+    const askCard = document.getElementById("askCard");
+    const yesCard = document.getElementById("yesCard");
+
+    const noPhrases = [
+      "No",
+      "Sei sicura?",
+      "E ja… 😭",
+      "Perchè no?",
+      "Ripensaci!",
+      "Ok… davvero?",
+      "Ultima possibilità!",
+      "DAI DAI DAIII",
+      "Ti pregooo 🙈",
+      "Ok, ho capito… clicca Sì o ti faccio male"
+    ];
+
+    let noClicks = 0;
+    let noIsFloating = false;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNoButton(){
+      // rende il "No" spostabile dentro il contenitore
+      const wrapRect = buttonsWrap.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
+
+      if (!noIsFloating){
+        noIsFloating = true;
+        buttonsWrap.style.justifyContent = "center";
+        noBtn.style.position = "absolute";
+      }
+
+      const pad = 6;
+      const maxX = wrapRect.width  - btnRect.width  - pad;
+      const maxY = wrapRect.height - btnRect.height - pad;
+
+      const x = clamp(Math.random() * maxX, pad, maxX);
+      const y = clamp(Math.random() * maxY, pad, maxY);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+    }
+
+    function growYes(){
+      const scale = clamp(1 + noClicks * 0.12, 1, 2.35);
+      yesBtn.style.transform = `scale(${scale})`;
+    }
+
+    noBtn.addEventListener("click", () => {
+      noClicks++;
+
+      const phrase = noPhrases[Math.min(noClicks, noPhrases.length - 1)];
+      noBtn.textContent = phrase;
+
+      growYes();
+
+      // dopo qualche click, inizia anche a spostarsi (più “gioco”)
+      if (noClicks >= 2) moveNoButton();
+    });
+
+    // su mouse/hover (desktop) e touch (mobile), prova a “scappare” dopo un po’
+    noBtn.addEventListener("pointerenter", () => {
+      if (noClicks >= 3) moveNoButton();
+    });
+    noBtn.addEventListener("touchstart", () => {
+      if (noClicks >= 4) moveNoButton();
+    }, { passive:true });
+
+    yesBtn.addEventListener("click", () => {
+      askCard.classList.add("hidden");
+      yesCard.classList.remove("hidden");
+      startHearts(1800);
+    });
+
+    // --- cuoricini ---
+    const heartsWrap = document.getElementById("hearts");
+
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const left = Math.random() * 100;
+      const duration = 1.6 + Math.random() * 1.6;
+      const size = 10 + Math.random() * 10;
+
+      h.style.left = left + "vw";
+      h.style.animationDuration = duration + "s";
+      h.style.width = size + "px";
+      h.style.height = size + "px";
+      heartsWrap.appendChild(h);
+
+      // pulizia
+      setTimeout(() => h.remove(), duration * 1000 + 200);
+    }
+
+    function startHearts(ms){
+      const end = Date.now() + ms;
+      const timer = setInterval(() => {
+        spawnHeart();
+        if (Date.now() > end) clearInterval(timer);
+      }, 60);
+    }
+  </script>
+</body>
+</html>
